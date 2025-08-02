@@ -1,4 +1,4 @@
-import { isValidQuarterFormat } from "./Validator";
+import { isValidQuarterFormat } from "./Validators";
 
 describe("isValidQuarterFormat", () => {
   it("should return true for valid quarter format", () => {
