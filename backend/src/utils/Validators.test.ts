@@ -1,4 +1,5 @@
 import { isValidQuarterFormat } from "./Validators";
+import { isValidStateFipCode } from "./Validators";
 
 describe("isValidQuarterFormat", () => {
   it("should return true for valid quarter format", () => {
@@ -17,5 +18,26 @@ describe("isValidQuarterFormat", () => {
     expect(isValidQuarterFormat("Q2-1993")).toBe(false);
     expect(isValidQuarterFormat("1993-Q0")).toBe(false);
     expect(isValidQuarterFormat("abcd-Q2")).toBe(false);
+  });
+
+  describe("isValidStateFipCode", () => {
+    it("should return true for valid two-digit state FIP codes", () => {
+      expect(isValidStateFipCode("01")).toBe(true);
+      expect(isValidStateFipCode("53")).toBe(true);
+      expect(isValidStateFipCode("00")).toBe(true);
+      expect(isValidStateFipCode("99")).toBe(true);
+    });
+
+    it("should return false for invalid state FIP codes", () => {
+      expect(isValidStateFipCode("1")).toBe(false);
+      expect(isValidStateFipCode("001")).toBe(false);
+      expect(isValidStateFipCode("a1")).toBe(false);
+      expect(isValidStateFipCode("1a")).toBe(false);
+      expect(isValidStateFipCode("")).toBe(false);
+      expect(isValidStateFipCode("123")).toBe(false);
+      expect(isValidStateFipCode(" 01")).toBe(false);
+      expect(isValidStateFipCode("01 ")).toBe(false);
+      expect(isValidStateFipCode("AA")).toBe(false);
+    });
   });
 });
