@@ -7,7 +7,7 @@ describe("CensusBureauService Integration", () => {
     const result = await service.getEmployment({
       state: "01",
       yearQuarter: "2023-Q4",
-      sex: 0,
+      sex: "0",
     });
 
     expect(result).toEqual([

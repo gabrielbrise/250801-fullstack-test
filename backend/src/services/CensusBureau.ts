@@ -3,17 +3,17 @@ import axios, { AxiosInstance } from "axios";
 const CENSUS_BUREAU_URL = "https://api.census.gov/data/timeseries/qwi/sa";
 const CENSUS_BUREAU_GET = "Emp";
 
-export interface CensusBurauInput {
+export interface CensusBureauInput {
   state: string;
   yearQuarter: string;
-  sex: number;
+  sex: string;
 }
 
 export interface CensusBureauQueryParams {
   get: string;
   for: string;
   time: string;
-  sex: number;
+  sex: string;
 }
 
 export interface CensusBureauResponse {}
@@ -27,7 +27,7 @@ export class CensusBureauService {
     });
   }
 
-  async getEmployment(params: CensusBurauInput) {
+  async getEmployment(params: CensusBureauInput) {
     const query: CensusBureauQueryParams = {
       get: CENSUS_BUREAU_GET,
       for: `state:${params.state}`,

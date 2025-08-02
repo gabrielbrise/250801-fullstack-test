@@ -1,5 +1,8 @@
-import { isValidQuarterFormat } from "./Validators";
-import { isValidStateFipCode } from "./Validators";
+import {
+  isValidQuarterFormat,
+  isValidStateFipCode,
+  isValidSexValue,
+} from "./Validators";
 
 describe("isValidQuarterFormat", () => {
   it("should return true for valid quarter format", () => {
@@ -38,6 +41,24 @@ describe("isValidQuarterFormat", () => {
       expect(isValidStateFipCode(" 01")).toBe(false);
       expect(isValidStateFipCode("01 ")).toBe(false);
       expect(isValidStateFipCode("AA")).toBe(false);
+    });
+
+    describe("isValidSexValue", () => {
+      it("should return true for valid sex values", () => {
+        expect(isValidSexValue("0")).toBe(true);
+        expect(isValidSexValue("1")).toBe(true);
+        expect(isValidSexValue("2")).toBe(true);
+      });
+
+      it("should return false for invalid sex values", () => {
+        expect(isValidSexValue("-1")).toBe(false);
+        expect(isValidSexValue("3")).toBe(false);
+        expect(isValidSexValue("")).toBe(false);
+        expect(isValidSexValue("a")).toBe(false);
+        expect(isValidSexValue("1.5")).toBe(false);
+        expect(isValidSexValue(" 1")).toBe(false);
+        expect(isValidSexValue("1 ")).toBe(false);
+      });
     });
   });
 });
