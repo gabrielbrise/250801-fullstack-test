@@ -1,47 +1,25 @@
-import React, { useEffect, useState } from "react";
-
-interface EmploymentRow {
-  state: string;
-  male?: number;
-  female?: number;
-  total: number;
-}
+import React from "react";
+import { useFiltersContext } from "../context/FiltersContext";
+import { useEmploymentAPIContext } from "../context/EmploymentAPIContext";
+import type { EmploymentRow } from "../types/Employment";
 
 const TableSection: React.FC = () => {
-  const sexValue = "0";
-
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [responseData, setResponseData] = useState<EmploymentRow[]>([]);
-
-  useEffect(() => {
-    fetch("http://localhost:3000/employment?state=00&yearQuarter=2023-Q4&sex=0")
-      .then((res) => res.json())
-      .then((res) => setResponseData(parseEmploymentData(res.employment)))
-      .then(() => setIsLoaded(true));
-  }, []);
-
-  function parseEmploymentData(data: string[][]): EmploymentRow[] {
-    return data.map(([total, time, sex, state]) => ({
-      total: Number(total),
-      time,
-      sex: Number(sex),
-      state: String(state),
-    }));
-  }
+  const { breakdownBySex } = useFiltersContext();
+  const { isLoaded, responseData } = useEmploymentAPIContext();
 
   return isLoaded ? (
     <table className="min-w-full border border-gray-300 mt-6">
       <thead>
         <tr>
           <th className="border px-4 py-2">State</th>
-          {sexValue !== "0" && <th className="border px-4 py-2">Male</th>}
-          {sexValue !== "0" && <th className="border px-4 py-2">Female</th>}
+          {breakdownBySex && <th className="border px-4 py-2">Male</th>}
+          {breakdownBySex && <th className="border px-4 py-2">Female</th>}
           <th className="border px-4 py-2">Total Employment</th>
         </tr>
       </thead>
       <tbody>
         {responseData.map((row) => (
-          <TableRow {...row} />
+          <TableRow {...row} key={row.state} />
         ))}
       </tbody>
     </table>
