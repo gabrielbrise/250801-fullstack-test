@@ -17,6 +17,13 @@
       "request": "launch",
       "command": "npm run test",
       "cwd": "${workspaceFolder}/backend"
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Debug React App",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/frontend/src"
     }
   ]
 }
