@@ -4,8 +4,8 @@ export function isValidQuarterFormat(yearQuarter: string): boolean {
 }
 
 export function isValidStateFipCode(stateFipCode: string): boolean {
-  // Matches exactly two digits, e.g., "01", "53"
-  return /^\d{2}$/.test(stateFipCode);
+  // Accepts one or more two-digit codes separated by commas, e.g., "01" or "01,02,04"
+  return /^(\d{2})(,\d{2})*$/.test(stateFipCode);
 }
 
 export function isValidSexValue(sexValue: string): boolean {
