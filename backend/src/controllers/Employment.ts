@@ -37,12 +37,12 @@ export async function getEmployment(req: Request, res: Response) {
       sex,
     });
 
-    const employment = response?.[1]?.[0];
-    if (employment === undefined) {
+    const result = response.slice(1);
+    if (result === undefined) {
       return res.status(404).json({ error: "Employment data not found" });
     }
-    cache.set(cacheKey, employment);
-    return res.json({ employment });
+    cache.set(cacheKey, result);
+    return res.json({ employment: result });
   } catch (err) {
     return res.status(500).json({ error: "Failed to fetch employment data" });
   }
