@@ -1,22 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-interface TableRow {
+interface EmploymentRow {
   state: string;
-  male: number;
-  female: number;
+  male?: number;
+  female?: number;
   total: number;
 }
 
-interface TableSectionProps {
-  data: TableRow[];
-  sexValue: string; // "0" = hide Male/Female, "1" = show Male, "2" = show Female, "all" = show both
-}
+const TableSection: React.FC = () => {
+  const sexValue = "0";
 
-const TableSection: React.FC<TableSectionProps> = ({ data, sexValue }) => {
-  const showMale = sexValue === "1" || sexValue === "all";
-  const showFemale = sexValue === "2" || sexValue === "all";
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [responseData, setResponseData] = useState<EmploymentRow[]>([]);
 
-  return (
+  useEffect(() => {
+    fetch("http://localhost:3000/employment?state=00&yearQuarter=2023-Q4&sex=0")
+      .then((res) => res.json())
+      .then((res) => setResponseData(parseEmploymentData(res.employment)))
+      .then(() => setIsLoaded(true));
+  }, []);
+
+  function parseEmploymentData(data: string[][]): EmploymentRow[] {
+    return data.map(([total, time, sex, state]) => ({
+      total: Number(total),
+      time,
+      sex: Number(sex),
+      state: String(state),
+    }));
+  }
+
+  return isLoaded ? (
     <table className="min-w-full border border-gray-300 mt-6">
       <thead>
         <tr>
@@ -27,21 +40,24 @@ const TableSection: React.FC<TableSectionProps> = ({ data, sexValue }) => {
         </tr>
       </thead>
       <tbody>
-        {data.map((row) => (
-          <tr key={row.state}>
-            <td className="border px-4 py-2 bg-gray-50">{row.state}</td>
-            {sexValue !== "0" && (
-              <td className="border px-4 py-2">{row.male}</td>
-            )}
-            {sexValue !== "0" && (
-              <td className="border px-4 py-2">{row.female}</td>
-            )}
-            <td className="border px-4 py-2">{row.total}</td>
-          </tr>
+        {responseData.map((row) => (
+          <TableRow {...row} />
         ))}
       </tbody>
     </table>
+  ) : (
+    <Loader />
   );
 };
 
+const TableRow: React.FC<EmploymentRow> = ({ state, male, female, total }) => (
+  <tr key={state}>
+    <td className="border px-4 py-2 bg-gray-50">{state}</td>
+    {male !== undefined && <td className="border px-4 py-2">{male}</td>}
+    {female !== undefined && <td className="border px-4 py-2">{female}</td>}
+    <td className="border px-4 py-2">{total}</td>
+  </tr>
+);
+
+const Loader: React.FC = () => <p>Loading...</p>;
 export default TableSection;

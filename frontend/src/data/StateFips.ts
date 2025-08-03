@@ -1,4 +1,5 @@
 const STATE_FIPS = {
+  "00": "ALL STATES",
   "01": "ALABAMA",
   "02": "ALASKA",
   "04": "ARIZONA",
