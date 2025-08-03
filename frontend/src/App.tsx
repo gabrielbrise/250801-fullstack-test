@@ -1,12 +1,13 @@
 import "./App.css";
+import HeaderSection from "./sections/HeaderSection";
+import FilterSection from "./sections/FilterSection";
 
 function App() {
   return (
-    <>
-      <div>
-        <h1 className="text-3xl font-bold underline"> Hello world! </h1>
-      </div>
-    </>
+    <div className="max-w-4xl mx-auto px-4">
+      <HeaderSection />
+      <FilterSection />
+    </div>
   );
 }
 
