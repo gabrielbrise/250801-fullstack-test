@@ -1,35 +1,76 @@
-import React from "react";
+import React, { useState } from "react";
 import { useEmploymentAPIContext } from "../context/EmploymentAPIContext";
 import type { EmploymentRow } from "../types/Employment";
 import STATE_FIPS from "../data/StateFips";
 
 const TableSection: React.FC = () => {
   const { isLoaded, responseData } = useEmploymentAPIContext();
-  const breakdownBySexData =
-    (responseData &&
-      responseData.employment.length > 0 &&
-      responseData.employment[0].male) ||
-    (responseData && responseData.employment[0].female);
+  const [sortBy, setSortBy] = useState<keyof EmploymentRow>("state");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
-  return isLoaded ? (
+  if (!isLoaded) return <Loader />;
+
+  const handleSort = (col: keyof EmploymentRow) => {
+    if (sortBy === col) {
+      setSortDir(sortDir === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(col);
+      setSortDir("asc");
+    }
+  };
+
+  const sortedData = [...(responseData?.employment ?? [])].sort((a, b) => {
+    const aVal = a[sortBy] ?? 0;
+    const bVal = b[sortBy] ?? 0;
+    if (aVal < bVal) return sortDir === "asc" ? -1 : 1;
+    if (aVal > bVal) return sortDir === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  const breakdownBySexData =
+    sortedData.length > 0 &&
+    (sortedData[0].male !== undefined || sortedData[0].female !== undefined);
+
+  return (
     <table className="min-w-full border border-gray-300 mt-6">
       <thead>
         <tr>
-          <th className="border px-4 py-2">State</th>
-          {breakdownBySexData && <th className="border px-4 py-2">Male</th>}
-          {breakdownBySexData && <th className="border px-4 py-2">Female</th>}
-          <th className="border px-4 py-2">Total Employment</th>
+          <th
+            className="border px-4 py-2 cursor-pointer"
+            onClick={() => handleSort("state")}
+          >
+            State
+          </th>
+          {breakdownBySexData && (
+            <th
+              className="border px-4 py-2 cursor-pointer"
+              onClick={() => handleSort("male")}
+            >
+              Male
+            </th>
+          )}
+          {breakdownBySexData && (
+            <th
+              className="border px-4 py-2 cursor-pointer"
+              onClick={() => handleSort("female")}
+            >
+              Female
+            </th>
+          )}
+          <th
+            className="border px-4 py-2 cursor-pointer"
+            onClick={() => handleSort("total")}
+          >
+            Total Employment
+          </th>
         </tr>
       </thead>
       <tbody>
-        {responseData &&
-          responseData.employment.map((row) => (
-            <TableRow {...row} key={row.state} />
-          ))}
+        {sortedData.map((row) => (
+          <TableRow {...row} key={row.state} />
+        ))}
       </tbody>
     </table>
-  ) : (
-    <Loader />
   );
 };
 
