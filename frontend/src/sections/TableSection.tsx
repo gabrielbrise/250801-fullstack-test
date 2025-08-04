@@ -9,6 +9,9 @@ const TableSection: React.FC = () => {
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   if (!isLoaded) return <Loader />;
+  if (isLoaded && !responseData) return <ErrorLoading />;
+  if (isLoaded && responseData?.employment.length === 0)
+    return <EmptyResults />;
 
   const handleSort = (col: keyof EmploymentRow) => {
     if (sortBy === col) {
@@ -89,5 +92,15 @@ const TableRow: React.FC<EmploymentRow> = ({ state, male, female, total }) => (
   </tr>
 );
 
-const Loader: React.FC = () => <p>Loading...</p>;
+const Loader: React.FC = () => <p className="text-center">Loading...</p>;
+const ErrorLoading: React.FC = () => (
+  <p className="text-center">
+    Something went wrong during the search. Try again later or contact our
+    support.
+  </p>
+);
+const EmptyResults: React.FC = () => (
+  <p className="text-center">No results found for this combination</p>
+);
+
 export default TableSection;
