@@ -6,7 +6,7 @@ import SearchButton from "../components/SearchButton";
 
 const FilterSection: React.FC = () => {
   return (
-    <div>
+    <div className="flex justify-center items-center gap-4">
       <StateSelectDropdown />
       <QuarterSelectedDropdown />
       <SexBreakdownToggle />

@@ -5,9 +5,10 @@ const SexBreakdownToggle: React.FC = () => {
   const { breakdownBySex, setBreakdownBySex } = useFiltersContext();
 
   return (
-    <label style={{ marginLeft: "1em" }}>
+    <label className="flex">
       Breakdown By Sex
       <input
+        className="size-6 ml-2"
         type="checkbox"
         checked={breakdownBySex}
         onChange={() => setBreakdownBySex(!breakdownBySex)}

@@ -1,27 +1,41 @@
 import React from "react";
-import SelectDropdown from "./SelectDropdown";
+import Select from "react-select";
 import { useFiltersContext } from "../context/FiltersContext";
 import STATE_FIPS from "../data/StateFips";
+
+const allStatesOption = { value: "ALL", label: "All States" };
+const options = [
+  allStatesOption,
+  ...Object.entries(STATE_FIPS).map(([value, label]) => ({
+    value,
+    label,
+  })),
+];
 
 const StateSelectDropdown: React.FC = () => {
   const { selectedStates, setSelectedStates } = useFiltersContext();
 
   return (
-    <SelectDropdown
-      multiple
-      value={selectedStates}
-      onChange={(e) =>
-        setSelectedStates(
-          Array.from(e.target.selectedOptions, (option) => option.value)
-        )
+    <Select
+      isMulti
+      options={options}
+      value={
+        selectedStates.includes("ALL")
+          ? [allStatesOption]
+          : options.filter((opt) => selectedStates.includes(opt.value))
       }
-    >
-      {Object.entries(STATE_FIPS).map(([key, value]) => (
-        <option key={key} value={key}>
-          {value}
-        </option>
-      ))}
-    </SelectDropdown>
+      onChange={(opts) => {
+        if (opts.some((opt) => opt.value === "ALL")) {
+          setSelectedStates(["ALL"]);
+        } else {
+          setSelectedStates(opts.map((opt) => opt.value));
+        }
+      }}
+      isOptionDisabled={(option) =>
+        selectedStates.includes("ALL") && option.value !== "ALL"
+      }
+      className="min-w-[200px] grow"
+    />
   );
 };
 

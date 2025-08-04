@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { EmploymentAPIContext } from "./EmploymentAPIContext";
 import type { EmploymentRow } from "../types/Employment";
 import { useFiltersContext } from "./FiltersContext";
+import STATE_FIPS from "../data/StateFips";
 
 export const EmploymentAPIProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -12,9 +13,16 @@ export const EmploymentAPIProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [responseData, setResponseData] = useState<EmploymentRow[]>([]);
 
+  let stateQuery;
+  if (selectedStates.some((opt) => opt === "ALL")) {
+    stateQuery = Object.keys(STATE_FIPS).join(",");
+  } else {
+    stateQuery = selectedStates.join(",");
+  }
+
   const searchEmploymentData = () => {
     const API_BASE_URL = "http://localhost:3000/employment";
-    const STATE_QUERY = `?state=${selectedStates.join(",")}`;
+    const STATE_QUERY = `?state=${stateQuery}`;
     const QUARTER_QUERY = `&yearQuarter=${selectedQuarter}`;
     const BREAKDOWN_BY_SEX_QUERY = `&sex=${breakdownBySex ? "1,2" : "0"}`;
     const REQUEST_URL = [
