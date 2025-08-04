@@ -14,7 +14,7 @@ const censusService = new CensusBureauService();
 const cache = new NodeCache({ stdTTL: 60 * 10 }); // cache for 10 minutes
 
 export async function getEmployment(req: Request, res: Response) {
-  const state = String(req.query.state ?? "");
+  const selectedStates = String(req.query.state ?? "");
   const yearQuarter = String(req.query.yearQuarter ?? "");
   const sex = String(req.query.sex ?? "");
 
@@ -24,7 +24,7 @@ export async function getEmployment(req: Request, res: Response) {
   }
 
   // Check cache before using CensusBureau service
-  const cacheKey = `${state}_${yearQuarter}_${sex}`;
+  const cacheKey = `${selectedStates}_${yearQuarter}_${sex}`;
   const cached = cache.get(cacheKey);
   if (cached) {
     return res.json({ employment: cached });
@@ -34,11 +34,11 @@ export async function getEmployment(req: Request, res: Response) {
     let response;
     let result;
     if (sex === "1,2") {
-      response = await RequestBreakdownBySex(state, yearQuarter);
+      response = await RequestBreakdownBySex(selectedStates, yearQuarter);
       result = response;
     } else {
       response = await censusService.getEmployment({
-        state,
+        state: selectedStates,
         yearQuarter,
         sex,
       });
@@ -49,7 +49,11 @@ export async function getEmployment(req: Request, res: Response) {
       return res.status(404).json({ error: "Employment data not found" });
     }
     cache.set(cacheKey, result);
-    return res.json({ employment: result });
+    return res.json({
+      selectedStates,
+      yearQuarter,
+      employment: result,
+    });
   } catch (err) {
     return res.status(500).json({ error: "Failed to fetch employment data" });
   }
