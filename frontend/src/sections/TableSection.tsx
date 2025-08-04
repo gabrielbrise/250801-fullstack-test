@@ -1,6 +1,7 @@
 import React from "react";
 import { useEmploymentAPIContext } from "../context/EmploymentAPIContext";
 import type { EmploymentRow } from "../types/Employment";
+import STATE_FIPS from "../data/StateFips";
 
 const TableSection: React.FC = () => {
   const { isLoaded, responseData } = useEmploymentAPIContext();
@@ -30,10 +31,16 @@ const TableSection: React.FC = () => {
 
 const TableRow: React.FC<EmploymentRow> = ({ state, male, female, total }) => (
   <tr key={state}>
-    <td className="border px-4 py-2 bg-gray-50">{state}</td>
-    {male !== undefined && <td className="border px-4 py-2">{male}</td>}
-    {female !== undefined && <td className="border px-4 py-2">{female}</td>}
-    <td className="border px-4 py-2">{total}</td>
+    <td className="border px-4 py-2 bg-gray-50">
+      {STATE_FIPS[state as keyof typeof STATE_FIPS]}
+    </td>
+    {male !== undefined && (
+      <td className="border px-4 py-2 text-center">{male}</td>
+    )}
+    {female !== undefined && (
+      <td className="border px-4 py-2 text-center">{female}</td>
+    )}
+    <td className="border px-4 py-2 text-center">{total}</td>
   </tr>
 );
 
