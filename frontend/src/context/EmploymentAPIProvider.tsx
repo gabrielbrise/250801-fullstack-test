@@ -12,7 +12,7 @@ export const EmploymentAPIProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [responseData, setResponseData] = useState<EmploymentRow[]>([]);
 
-  useEffect(() => {
+  const searchEmploymentData = () => {
     const API_BASE_URL = "http://localhost:3000/employment";
     const STATE_QUERY = `?state=${selectedStates.join(",")}`;
     const QUARTER_QUERY = `&yearQuarter=${selectedQuarter}`;
@@ -24,15 +24,20 @@ export const EmploymentAPIProvider: React.FC<{ children: React.ReactNode }> = ({
       BREAKDOWN_BY_SEX_QUERY,
     ].join("");
 
+    setIsLoaded(false);
     setIsLoading(true);
 
     fetch(REQUEST_URL)
       .then((res) => res.json())
-      .then((res) => setResponseData(parseEmploymentData(res.employment)))
+      .then((res) => setResponseData(res.employment))
       .then(() => {
         setIsLoaded(true);
         setIsLoading(false);
       });
+  };
+
+  useEffect(() => {
+    searchEmploymentData();
   }, []);
 
   return (
@@ -44,18 +49,10 @@ export const EmploymentAPIProvider: React.FC<{ children: React.ReactNode }> = ({
         setIsLoaded,
         responseData,
         setResponseData,
+        searchEmploymentData,
       }}
     >
       {children}
     </EmploymentAPIContext.Provider>
   );
 };
-
-function parseEmploymentData(data: string[][]): EmploymentRow[] {
-  return data.map(([total, time, sex, state]) => ({
-    total: Number(total),
-    time,
-    sex: Number(sex),
-    state: String(state),
-  }));
-}

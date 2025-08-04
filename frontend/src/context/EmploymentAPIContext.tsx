@@ -8,6 +8,7 @@ export interface EmploymentAPIContextType {
   setIsLoaded: (value: boolean) => void;
   responseData: EmploymentRow[];
   setResponseData: (data: EmploymentRow[]) => void;
+  searchEmploymentData: () => void;
 }
 
 export const EmploymentAPIContext = createContext<

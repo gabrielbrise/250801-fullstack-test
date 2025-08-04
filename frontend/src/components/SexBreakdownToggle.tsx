@@ -6,12 +6,12 @@ const SexBreakdownToggle: React.FC = () => {
 
   return (
     <label style={{ marginLeft: "1em" }}>
+      Breakdown By Sex
       <input
         type="checkbox"
         checked={breakdownBySex}
         onChange={() => setBreakdownBySex(!breakdownBySex)}
       />
-      Toggle
     </label>
   );
 };

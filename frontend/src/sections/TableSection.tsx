@@ -1,19 +1,19 @@
 import React from "react";
-import { useFiltersContext } from "../context/FiltersContext";
 import { useEmploymentAPIContext } from "../context/EmploymentAPIContext";
 import type { EmploymentRow } from "../types/Employment";
 
 const TableSection: React.FC = () => {
-  const { breakdownBySex } = useFiltersContext();
   const { isLoaded, responseData } = useEmploymentAPIContext();
+  const breakdownBySexData =
+    responseData.length > 0 && (responseData[0].male || responseData[0].female);
 
   return isLoaded ? (
     <table className="min-w-full border border-gray-300 mt-6">
       <thead>
         <tr>
           <th className="border px-4 py-2">State</th>
-          {breakdownBySex && <th className="border px-4 py-2">Male</th>}
-          {breakdownBySex && <th className="border px-4 py-2">Female</th>}
+          {breakdownBySexData && <th className="border px-4 py-2">Male</th>}
+          {breakdownBySexData && <th className="border px-4 py-2">Female</th>}
           <th className="border px-4 py-2">Total Employment</th>
         </tr>
       </thead>
