@@ -9,5 +9,10 @@ export function isValidStateFipCode(stateFipCode: string): boolean {
 }
 
 export function isValidSexValue(sexValue: string): boolean {
-  return sexValue === "0" || sexValue === "1" || sexValue === "2";
+  return (
+    sexValue === "0" ||
+    sexValue === "1" ||
+    sexValue === "2" ||
+    sexValue === "1,2"
+  );
 }

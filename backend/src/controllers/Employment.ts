@@ -31,13 +31,20 @@ export async function getEmployment(req: Request, res: Response) {
   }
 
   try {
-    const response = await censusService.getEmployment({
-      state,
-      yearQuarter,
-      sex,
-    });
+    let response;
+    let result;
+    if (sex === "1,2") {
+      response = await RequestBreakdownBySex(state, yearQuarter);
+      result = response;
+    } else {
+      response = await censusService.getEmployment({
+        state,
+        yearQuarter,
+        sex,
+      });
+      result = ParseEmploymentData(response.slice(1));
+    }
 
-    const result = response.slice(1);
     if (result === undefined) {
       return res.status(404).json({ error: "Employment data not found" });
     }
@@ -48,10 +55,49 @@ export async function getEmployment(req: Request, res: Response) {
   }
 }
 
+async function RequestBreakdownBySex(state: string, yearQuarter: string) {
+  let result: any = [];
+
+  const [maleRes, femaleRes] = await Promise.all([
+    censusService.getEmployment({ state, yearQuarter, sex: "1" }),
+    censusService.getEmployment({ state, yearQuarter, sex: "2" }),
+  ]);
+  // Assume response format: [["Emp", "time", "sex", "state"], ["123", "2023-Q4", "1", "01"]]
+  const maleData = maleRes[1];
+  const femaleData = femaleRes[1];
+
+  for (let i = 0; i < maleData.length; i++) {
+    result.push({
+      state: maleData[3],
+      male: parseInt(maleData[0]),
+      female: parseInt(femaleData[0]),
+      total: parseInt(maleData[0]) + parseInt(femaleData[0]),
+    });
+  }
+
+  return result;
+}
+
 function IsValidEmploymentInput(query: any): boolean {
   return (
     isValidStateFipCode(query.state) &&
     isValidQuarterFormat(query.yearQuarter) &&
     isValidSexValue(query.sex)
   );
+}
+
+export interface EmploymentRow {
+  state: string;
+  male?: number;
+  female?: number;
+  total: number;
+}
+
+function ParseEmploymentData(data: string[][]): EmploymentRow[] {
+  return data.map(([total, time, sex, state]) => ({
+    total: Number(total),
+    time,
+    sex: Number(sex),
+    state: String(state),
+  }));
 }
