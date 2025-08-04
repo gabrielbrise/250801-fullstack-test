@@ -62,16 +62,13 @@ async function RequestBreakdownBySex(state: string, yearQuarter: string) {
     censusService.getEmployment({ state, yearQuarter, sex: "1" }),
     censusService.getEmployment({ state, yearQuarter, sex: "2" }),
   ]);
-  // Assume response format: [["Emp", "time", "sex", "state"], ["123", "2023-Q4", "1", "01"]]
-  const maleData = maleRes[1];
-  const femaleData = femaleRes[1];
 
-  for (let i = 0; i < maleData.length; i++) {
+  for (let i = 1; i < maleRes.length; i++) {
     result.push({
-      state: maleData[3],
-      male: parseInt(maleData[0]),
-      female: parseInt(femaleData[0]),
-      total: parseInt(maleData[0]) + parseInt(femaleData[0]),
+      state: maleRes[i][3],
+      male: parseInt(maleRes[i][0]),
+      female: parseInt(femaleRes[i][0]),
+      total: parseInt(maleRes[i][0]) + parseInt(femaleRes[i][0]),
     });
   }
 
