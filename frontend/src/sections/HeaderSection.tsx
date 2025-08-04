@@ -1,24 +1,31 @@
 import React from "react";
-import { useFiltersContext } from "../context/FiltersContext";
 import { ALL_STATES } from "../context/FiltersProvider";
 import STATE_FIPS from "../data/StateFips";
+import { useEmploymentAPIContext } from "../context/EmploymentAPIContext";
 
 const HeaderSection: React.FC = () => {
-  const { selectedStates, selectedQuarter } = useFiltersContext();
+  const { responseData } = useEmploymentAPIContext();
 
-  const allStatesString = ALL_STATES.join(", ");
-  const selectedStatesString = selectedStates.join(", ");
-  const selectedStatesTexts = selectedStates
+  const selectedStatesString = responseData?.selectedStates || "ALL";
+  const selectedStatesArr = responseData?.selectedStates
+    ? responseData.selectedStates.split(",")
+    : [];
+  const allStatesArr = ALL_STATES;
+
+  const selectedStatesTexts = selectedStatesString
+    .split(",")
     .map((stateFip) => STATE_FIPS[stateFip as keyof typeof STATE_FIPS])
     .join(", ");
 
   const isAllStatesSelected =
-    allStatesString == selectedStatesString || selectedStates.includes("ALL");
+    (selectedStatesArr.length === allStatesArr.length &&
+      selectedStatesArr.every((state) => allStatesArr.includes(state))) ||
+    selectedStatesArr.includes("ALL");
   const statesText = isAllStatesSelected ? "All States" : selectedStatesTexts;
 
   return (
-    <h1 className="text-2xl flex justify-center py-8 font-montserrat font-bold">
-      Employment for {statesText} on {selectedQuarter}
+    <h1 className="text-2xl flex justify-center py-4 font-montserrat font-bold mt-8">
+      Employment for {statesText} on {responseData?.yearQuarter}
     </h1>
   );
 };

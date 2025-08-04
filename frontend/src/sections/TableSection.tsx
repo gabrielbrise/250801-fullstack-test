@@ -6,7 +6,10 @@ import STATE_FIPS from "../data/StateFips";
 const TableSection: React.FC = () => {
   const { isLoaded, responseData } = useEmploymentAPIContext();
   const breakdownBySexData =
-    responseData.length > 0 && (responseData[0].male || responseData[0].female);
+    (responseData &&
+      responseData.employment.length > 0 &&
+      responseData.employment[0].male) ||
+    (responseData && responseData.employment[0].female);
 
   return isLoaded ? (
     <table className="min-w-full border border-gray-300 mt-6">
@@ -19,9 +22,10 @@ const TableSection: React.FC = () => {
         </tr>
       </thead>
       <tbody>
-        {responseData.map((row) => (
-          <TableRow {...row} key={row.state} />
-        ))}
+        {responseData &&
+          responseData.employment.map((row) => (
+            <TableRow {...row} key={row.state} />
+          ))}
       </tbody>
     </table>
   ) : (

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { EmploymentAPIContext } from "./EmploymentAPIContext";
-import type { EmploymentRow } from "../types/Employment";
+import {
+  EmploymentAPIContext,
+  type EmploymentResponse,
+} from "./EmploymentAPIContext";
 import { useFiltersContext } from "./FiltersContext";
 import STATE_FIPS from "../data/StateFips";
 
@@ -11,7 +13,9 @@ export const EmploymentAPIProvider: React.FC<{ children: React.ReactNode }> = ({
     useFiltersContext();
   const [isLoading, setIsLoading] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [responseData, setResponseData] = useState<EmploymentRow[]>([]);
+  const [responseData, setResponseData] = useState<EmploymentResponse | null>(
+    null
+  );
 
   let stateQuery;
   if (selectedStates.some((opt) => opt === "ALL")) {
@@ -37,7 +41,13 @@ export const EmploymentAPIProvider: React.FC<{ children: React.ReactNode }> = ({
 
     fetch(REQUEST_URL)
       .then((res) => res.json())
-      .then((res) => setResponseData(res.employment))
+      .then((res) =>
+        setResponseData({
+          selectedStates: res.selectedStates,
+          yearQuarter: res.yearQuarter,
+          employment: res.employment,
+        })
+      )
       .then(() => {
         setIsLoaded(true);
         setIsLoading(false);
