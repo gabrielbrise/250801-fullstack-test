@@ -15,6 +15,13 @@ const options = [
 const StateSelectDropdown: React.FC = () => {
   const { selectedStates, setSelectedStates } = useFiltersContext();
 
+  // Handle blur: if nothing is selected, select "All States"
+  const handleBlur = () => {
+    if (selectedStates.length === 0) {
+      setSelectedStates(["ALL"]);
+    }
+  };
+
   return (
     <Select
       isMulti
@@ -31,6 +38,7 @@ const StateSelectDropdown: React.FC = () => {
           setSelectedStates(opts.map((opt) => opt.value));
         }
       }}
+      onBlur={handleBlur}
       isOptionDisabled={(option) =>
         selectedStates.includes("ALL") && option.value !== "ALL"
       }
