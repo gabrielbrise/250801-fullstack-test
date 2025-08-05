@@ -1,9 +1,12 @@
 import express from "express";
 import cors from "cors";
 import { getEmployment } from "./controllers/Employment";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 app.use(cors()); // <-- Allow all origins for dev
 
