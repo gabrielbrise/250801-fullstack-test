@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import type { EmploymentRow } from "../types/Employment";
+import type { EmploymentRow } from "../types/Api";
 
 export interface EmploymentAPIContextType {
   isLoading: boolean;
