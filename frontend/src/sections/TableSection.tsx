@@ -3,6 +3,7 @@ import { useEmploymentAPIContext } from "../context/EmploymentAPIContext";
 import type { EmploymentRow } from "../types/Api";
 import STATE_FIPS from "../data/StateFips";
 import ErrorBoundary from "../components/ErrorBoundary";
+import SortableHeader from "../components/SortableHeader";
 
 interface SortConfig {
   column: keyof EmploymentRow;
@@ -77,25 +78,6 @@ const TableSection: React.FC = () => {
     </table>
   );
 };
-
-interface SortableHeaderProps {
-  column: keyof EmploymentRow;
-  onClick: (column: keyof EmploymentRow) => void;
-  children: React.ReactNode;
-}
-
-const SortableHeader: React.FC<SortableHeaderProps> = ({
-  column,
-  onClick,
-  children,
-}) => (
-  <th
-    className="border px-4 py-2 cursor-pointer hover:bg-gray-100"
-    onClick={() => onClick(column)}
-  >
-    {children}
-  </th>
-);
 
 const TableRow: React.FC<EmploymentRow> = ({ state, male, female, total }) => (
   <tr key={state}>
