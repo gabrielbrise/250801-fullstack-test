@@ -1,33 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useEmploymentAPIContext } from "../context/EmploymentAPIContext";
-import type { EmploymentRow } from "../types/Employment";
+import type { EmploymentRow } from "../types/Api";
 import STATE_FIPS from "../data/StateFips";
 import ErrorBoundary from "../components/ErrorBoundary";
 
+interface SortConfig {
+  column: keyof EmploymentRow;
+  direction: "asc" | "desc";
+}
+
 const TableSection: React.FC = () => {
   const { isLoaded, responseData } = useEmploymentAPIContext();
-  const [sortBy, setSortBy] = useState<keyof EmploymentRow>("state");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
+    column: "state",
+    direction: "asc",
+  });
+
+  const handleSort = useCallback((column: keyof EmploymentRow) => {
+    setSortConfig((prev) => ({
+      column,
+      direction:
+        prev.column === column && prev.direction === "asc" ? "desc" : "asc",
+    }));
+  }, []);
 
   if (!isLoaded) return <Loader />;
   if (isLoaded && !responseData) return <ErrorLoading />;
   if (isLoaded && responseData?.employment.length === 0)
     return <EmptyResults />;
 
-  const handleSort = (col: keyof EmploymentRow) => {
-    if (sortBy === col) {
-      setSortDir(sortDir === "asc" ? "desc" : "asc");
-    } else {
-      setSortBy(col);
-      setSortDir("asc");
-    }
-  };
-
   const sortedData = [...(responseData?.employment ?? [])].sort((a, b) => {
-    const aVal = a[sortBy] ?? 0;
-    const bVal = b[sortBy] ?? 0;
-    if (aVal < bVal) return sortDir === "asc" ? -1 : 1;
-    if (aVal > bVal) return sortDir === "asc" ? 1 : -1;
+    const aVal = a[sortConfig.column] ?? 0;
+    const bVal = b[sortConfig.column] ?? 0;
+    if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+    if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
     return 0;
   });
 
