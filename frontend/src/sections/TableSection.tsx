@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useEmploymentAPIContext } from "../context/EmploymentAPIContext";
 import type { EmploymentRow } from "../types/Api";
 import STATE_FIPS from "../data/StateFips";
@@ -24,55 +24,49 @@ const TableSection: React.FC = () => {
     }));
   }, []);
 
+  const sortedData = useMemo(() => {
+    if (!responseData?.employment) return [];
+    return [...responseData.employment].sort((a, b) => {
+      const aVal = a[sortConfig.column] ?? 0;
+      const bVal = b[sortConfig.column] ?? 0;
+      if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [responseData?.employment, sortConfig]);
+
+  const hasBreakdownData = useMemo(() => {
+    return (
+      sortedData.length > 0 &&
+      (sortedData[0].male !== undefined || sortedData[0].female !== undefined)
+    );
+  }, [sortedData]);
+
   if (!isLoaded) return <Loader />;
   if (isLoaded && !responseData) return <ErrorLoading />;
   if (isLoaded && responseData?.employment.length === 0)
     return <EmptyResults />;
 
-  const sortedData = [...(responseData?.employment ?? [])].sort((a, b) => {
-    const aVal = a[sortConfig.column] ?? 0;
-    const bVal = b[sortConfig.column] ?? 0;
-    if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-    if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-    return 0;
-  });
-
-  const breakdownBySexData =
-    sortedData.length > 0 &&
-    (sortedData[0].male !== undefined || sortedData[0].female !== undefined);
-
   return (
     <table className="min-w-full border border-gray-300 mt-6">
       <thead>
         <tr>
-          <th
-            className="border px-4 py-2 cursor-pointer"
-            onClick={() => handleSort("state")}
-          >
+          <SortableHeader column="state" onClick={handleSort}>
             State
-          </th>
-          {breakdownBySexData && (
-            <th
-              className="border px-4 py-2 cursor-pointer"
-              onClick={() => handleSort("male")}
-            >
+          </SortableHeader>
+          {hasBreakdownData && (
+            <SortableHeader column="male" onClick={handleSort}>
               Male
-            </th>
+            </SortableHeader>
           )}
-          {breakdownBySexData && (
-            <th
-              className="border px-4 py-2 cursor-pointer"
-              onClick={() => handleSort("female")}
-            >
+          {hasBreakdownData && (
+            <SortableHeader column="female" onClick={handleSort}>
               Female
-            </th>
+            </SortableHeader>
           )}
-          <th
-            className="border px-4 py-2 cursor-pointer"
-            onClick={() => handleSort("total")}
-          >
+          <SortableHeader column="total" onClick={handleSort}>
             Total Employment
-          </th>
+          </SortableHeader>
         </tr>
       </thead>
       <tbody>
@@ -83,6 +77,25 @@ const TableSection: React.FC = () => {
     </table>
   );
 };
+
+interface SortableHeaderProps {
+  column: keyof EmploymentRow;
+  onClick: (column: keyof EmploymentRow) => void;
+  children: React.ReactNode;
+}
+
+const SortableHeader: React.FC<SortableHeaderProps> = ({
+  column,
+  onClick,
+  children,
+}) => (
+  <th
+    className="border px-4 py-2 cursor-pointer hover:bg-gray-100"
+    onClick={() => onClick(column)}
+  >
+    {children}
+  </th>
+);
 
 const TableRow: React.FC<EmploymentRow> = ({ state, male, female, total }) => (
   <tr key={state}>
