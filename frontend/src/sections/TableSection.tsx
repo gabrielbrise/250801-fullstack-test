@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useEmploymentAPIContext } from "../context/EmploymentAPIContext";
 import type { EmploymentRow } from "../types/Employment";
 import STATE_FIPS from "../data/StateFips";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 const TableSection: React.FC = () => {
   const { isLoaded, responseData } = useEmploymentAPIContext();
@@ -103,4 +104,10 @@ const EmptyResults: React.FC = () => (
   <p className="text-center">No results found for this combination</p>
 );
 
-export default TableSection;
+const App: React.FC = () => (
+  <ErrorBoundary fallback={<ErrorLoading />}>
+    <TableSection />
+  </ErrorBoundary>
+);
+
+export default App;
