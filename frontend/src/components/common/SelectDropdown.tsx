@@ -8,7 +8,7 @@ const SelectDropdown: React.FC<SelectDropdownProps> = ({
 }) => {
   return (
     <select
-      className="border border-gray-300 rounded-2xl px-3 py-2 mr-2"
+      className="border border-gray-300 rounded px-3 py-2 mr-2"
       {...props}
     >
       {children}
