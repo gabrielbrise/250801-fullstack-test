@@ -4,13 +4,11 @@ import { useFiltersContext } from "../context/FiltersContext";
 import STATE_FIPS from "../data/StateFips";
 
 const allStatesOption = { value: "ALL", label: "All States" };
-const options = [
-  allStatesOption,
-  ...Object.entries(STATE_FIPS).map(([value, label]) => ({
-    value,
-    label,
-  })),
-];
+const stateOptions = Object.entries(STATE_FIPS)
+  .map(([value, label]) => ({ value, label }))
+  .sort((a, b) => a.label.localeCompare(b.label)); // Sort alphabetically
+
+const options = [allStatesOption, ...stateOptions];
 
 const StateSelectDropdown: React.FC = () => {
   const { selectedStates, setSelectedStates } = useFiltersContext();
