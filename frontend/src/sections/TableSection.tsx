@@ -4,11 +4,7 @@ import type { EmploymentRow } from "../types/Api";
 import STATE_FIPS from "../data/StateFips";
 import ErrorBoundary from "../components/ErrorBoundary";
 import SortableHeader from "../components/SortableHeader";
-
-interface SortConfig {
-  column: keyof EmploymentRow;
-  direction: "asc" | "desc";
-}
+import { sortTableData, type SortConfig } from "../utils/Sort";
 
 const TableSection: React.FC = () => {
   const { isLoaded, responseData } = useEmploymentAPIContext();
@@ -26,14 +22,7 @@ const TableSection: React.FC = () => {
   }, []);
 
   const sortedData = useMemo(() => {
-    if (!responseData?.employment) return [];
-    return [...responseData.employment].sort((a, b) => {
-      const aVal = a[sortConfig.column] ?? 0;
-      const bVal = b[sortConfig.column] ?? 0;
-      if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-      if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-      return 0;
-    });
+    return sortTableData(responseData, sortConfig);
   }, [responseData?.employment, sortConfig]);
 
   const hasBreakdownData = useMemo(() => {
