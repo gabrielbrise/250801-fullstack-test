@@ -4,13 +4,14 @@ import STATE_FIPS from "../data/StateFips";
 import { useEmploymentAPIContext } from "../context/EmploymentAPIContext";
 
 const HeaderSection: React.FC = () => {
-  const { responseData } = useEmploymentAPIContext();
+  const { responseData, isLoaded } = useEmploymentAPIContext();
 
   const selectedStatesString = responseData?.selectedStates || "ALL";
   const selectedStatesArr = responseData?.selectedStates
     ? responseData.selectedStates.split(",")
     : [];
   const allStatesArr = ALL_STATES;
+  const allStatesText = "All States";
 
   const selectedStatesTexts = selectedStatesString
     .split(",")
@@ -21,11 +22,16 @@ const HeaderSection: React.FC = () => {
     (selectedStatesArr.length === allStatesArr.length &&
       selectedStatesArr.every((state) => allStatesArr.includes(state))) ||
     selectedStatesArr.includes("ALL");
-  const statesText = isAllStatesSelected ? "All States" : selectedStatesTexts;
+
+  const statesText = isAllStatesSelected ? allStatesText : selectedStatesTexts;
+
+  const headerText = isLoaded
+    ? `Employment for ${statesText} on ${responseData?.yearQuarter}`
+    : "";
 
   return (
     <h1 className="text-2xl flex justify-center py-4 font-montserrat font-bold mt-8">
-      Employment for {statesText} on {responseData?.yearQuarter}
+      {headerText}
     </h1>
   );
 };
