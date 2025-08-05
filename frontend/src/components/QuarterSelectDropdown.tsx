@@ -1,5 +1,5 @@
 import React from "react";
-import SelectDropdown from "./SelectDropdown";
+import SelectDropdown from "./common/SelectDropdown";
 import YEAR_QUARTERS from "../data/YearQuarters";
 import { useFiltersContext } from "../context/FiltersContext";
 
