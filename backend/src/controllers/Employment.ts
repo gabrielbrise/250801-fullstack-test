@@ -1,8 +1,5 @@
 import { Request, Response } from "express";
-import {
-  CensusBureauInput,
-  CensusBureauService,
-} from "../services/CensusBureau";
+import { CensusBureauService } from "../services/CensusBureau";
 import {
   isValidQuarterFormat,
   isValidStateFipCode,
@@ -10,16 +7,18 @@ import {
 } from "../utils/Validators";
 import NodeCache from "node-cache";
 
-const censusService = new CensusBureauService();
-const cache = new NodeCache({ stdTTL: 60 * 10 }); // cache for 10 minutes
+// Keep cache as singleton for production
+const cache = new NodeCache({ stdTTL: 60 * 10 });
 
 export async function getEmployment(req: Request, res: Response) {
+  const censusService = new CensusBureauService();
+
   const selectedStates = String(req.query.state ?? "");
   const yearQuarter = String(req.query.yearQuarter ?? "");
   const sex = String(req.query.sex ?? "");
 
   // Validate input
-  if (!IsValidEmploymentInput(req.query)) {
+  if (!isValidEmploymentInput(req.query)) {
     return res.status(400).json({ error: "Invalid input format" });
   }
 
@@ -27,14 +26,18 @@ export async function getEmployment(req: Request, res: Response) {
   const cacheKey = `${selectedStates}_${yearQuarter}_${sex}`;
   const cached = cache.get(cacheKey);
   if (cached) {
-    return res.json({ employment: cached });
+    return res.json({
+      selectedStates,
+      yearQuarter,
+      employment: cached,
+    });
   }
 
   try {
     let response;
     let result;
     if (sex === "1,2") {
-      response = await RequestBreakdownBySex(selectedStates, yearQuarter);
+      response = await requestBreakdownBySex(selectedStates, yearQuarter);
       result = response;
     } else {
       response = await censusService.getEmployment({
@@ -42,10 +45,10 @@ export async function getEmployment(req: Request, res: Response) {
         yearQuarter,
         sex,
       });
-      result = ParseEmploymentData(response.slice(1));
+      result = parseEmploymentData(response.slice(1));
     }
 
-    if (result === undefined) {
+    if (result === undefined || result.length === 0) {
       return res.status(404).json({ error: "Employment data not found" });
     }
     cache.set(cacheKey, result);
@@ -59,7 +62,8 @@ export async function getEmployment(req: Request, res: Response) {
   }
 }
 
-async function RequestBreakdownBySex(state: string, yearQuarter: string) {
+async function requestBreakdownBySex(state: string, yearQuarter: string) {
+  const censusService = new CensusBureauService(); // Add here too
   let result: any = [];
 
   const [maleRes, femaleRes] = await Promise.all([
@@ -79,12 +83,18 @@ async function RequestBreakdownBySex(state: string, yearQuarter: string) {
   return result;
 }
 
-function IsValidEmploymentInput(query: any): boolean {
+export function isValidEmploymentInput(query: any): boolean {
   return (
     isValidStateFipCode(query.state) &&
     isValidQuarterFormat(query.yearQuarter) &&
     isValidSexValue(query.sex)
   );
+}
+
+export interface EmploymentResponse {
+  selectedStates: string;
+  yearQuarter: string;
+  employment: EmploymentRow[];
 }
 
 export interface EmploymentRow {
@@ -94,7 +104,7 @@ export interface EmploymentRow {
   total: number;
 }
 
-function ParseEmploymentData(data: string[][]): EmploymentRow[] {
+export function parseEmploymentData(data: string[][]): EmploymentRow[] {
   return data.map(([total, time, sex, state]) => ({
     total: Number(total),
     time,

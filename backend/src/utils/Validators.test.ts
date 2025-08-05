@@ -6,6 +6,7 @@ import {
 
 describe("isValidQuarterFormat", () => {
   it("should return true for valid quarter format", () => {
+    expect(isValidQuarterFormat("2023-Q1")).toBe(true);
     expect(isValidQuarterFormat("1993-Q2")).toBe(true);
     expect(isValidQuarterFormat("2020-Q4")).toBe(true);
     expect(isValidQuarterFormat("0001-Q1")).toBe(true);
@@ -48,6 +49,7 @@ describe("isValidQuarterFormat", () => {
         expect(isValidSexValue("0")).toBe(true);
         expect(isValidSexValue("1")).toBe(true);
         expect(isValidSexValue("2")).toBe(true);
+        expect(isValidSexValue("1,2")).toBe(true);
       });
 
       it("should return false for invalid sex values", () => {
