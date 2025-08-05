@@ -8,7 +8,7 @@ const SexBreakdownToggle: React.FC = () => {
     <label className="flex min-w-48 rounded border p-2 border-gray-300 cursor-pointer">
       Breakdown By Sex
       <input
-        className="size-6 ml-2"
+        className="size-6 ml-2 accent-gray-800"
         type="checkbox"
         checked={breakdownBySex}
         onChange={() => setBreakdownBySex(!breakdownBySex)}
