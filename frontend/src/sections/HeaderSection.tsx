@@ -25,9 +25,10 @@ const HeaderSection: React.FC = () => {
 
   const statesText = isAllStatesSelected ? allStatesText : selectedStatesTexts;
 
-  const headerText = isLoaded
-    ? `Employment for ${statesText} on ${responseData?.yearQuarter}`
-    : "";
+  const headerText =
+    isLoaded && responseData?.employment
+      ? `Employment for ${statesText} on ${responseData?.yearQuarter}`
+      : "";
 
   return (
     <h1 className="text-2xl flex justify-center py-4 font-montserrat font-bold mt-8">
