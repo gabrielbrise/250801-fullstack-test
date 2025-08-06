@@ -6,7 +6,9 @@ jest.doMock("node-cache");
 jest.doMock("../services/CensusBureau");
 
 describe("getEmployment", () => {
-  let mockRequest: Partial<Request>;
+  let mockRequest: {
+    query: { state: string; yearQuarter: string; sex: string };
+  };
   let mockResponse: Partial<Response>;
   let mockJson: jest.Mock;
   let mockStatus: jest.Mock;
@@ -80,7 +82,7 @@ describe("getEmployment", () => {
       ["1000", "2023-Q1", "0", "01"],
     ]);
 
-    await getEmployment(mockRequest as Request, mockResponse as Response);
+    await getEmployment(mockRequest, mockResponse as Response);
 
     // Verify first call fetched from service and set cache
     expect(mockCacheGet).toHaveBeenCalledTimes(1);
@@ -93,7 +95,7 @@ describe("getEmployment", () => {
     // Second call: cache hit
     mockCacheGet.mockReturnValue(cachedValue);
 
-    await getEmployment(mockRequest as Request, mockResponse as Response);
+    await getEmployment(mockRequest, mockResponse as Response);
 
     // Verify second call used cache and didn't call service
     expect(mockCacheGet).toHaveBeenCalledTimes(1);
@@ -109,7 +111,7 @@ describe("getEmployment", () => {
   it("should return 400 if input validation fails", async () => {
     (Validators.isValidStateFipCode as jest.Mock).mockReturnValue(false);
 
-    await getEmployment(mockRequest as Request, mockResponse as Response);
+    await getEmployment(mockRequest, mockResponse as Response);
 
     expect(mockStatus).toHaveBeenCalledWith(400);
     expect(mockJson).toHaveBeenCalledWith({ error: "Invalid input format" });
@@ -123,7 +125,7 @@ describe("getEmployment", () => {
       ["2000", "2023-Q1", "0", "01"],
     ]);
 
-    await getEmployment(mockRequest as Request, mockResponse as Response);
+    await getEmployment(mockRequest, mockResponse as Response);
 
     expect(mockJson).toHaveBeenCalledWith({
       selectedStates: "01",
@@ -138,7 +140,7 @@ describe("getEmployment", () => {
     // Return empty array (length 0) to trigger undefined result
     getEmploymentMock.mockResolvedValue([]);
 
-    await getEmployment(mockRequest as Request, mockResponse as Response);
+    await getEmployment(mockRequest, mockResponse as Response);
 
     expect(mockStatus).toHaveBeenCalledWith(404);
     expect(mockJson).toHaveBeenCalledWith({
@@ -151,7 +153,7 @@ describe("getEmployment", () => {
 
     getEmploymentMock.mockRejectedValue(new Error("Service error"));
 
-    await getEmployment(mockRequest as Request, mockResponse as Response);
+    await getEmployment(mockRequest, mockResponse as Response);
 
     expect(mockStatus).toHaveBeenCalledWith(500);
     expect(mockJson).toHaveBeenCalledWith({
@@ -174,7 +176,7 @@ describe("getEmployment", () => {
         ["800", "2023-Q1", "2", "01"],
       ]);
 
-    await getEmployment(mockRequest as Request, mockResponse as Response);
+    await getEmployment(mockRequest, mockResponse as Response);
 
     expect(mockJson).toHaveBeenCalledWith({
       selectedStates: "01",
